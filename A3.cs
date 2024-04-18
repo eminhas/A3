@@ -1,101 +1,118 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Assignment3
 {
     /// <summary>
-    /// Library of statistical functions using Generics for different statistical calculatuions
-    /// see http://www.calculator.net/standard-deviation-calculator.html for sample standard deviation calculations
-    ///  
-    /// @author Joey Programmer
+    /// Provides a library of statistical functions using generics for various statistical calculations.
+    /// Reference: <see href="http://www.calculator.net/standard-deviation-calculator.html">Standard Deviation Calculator</see>
     /// </summary>
-
-    public class A3
+    /// <remarks>
+    /// Class names and method names use PascalCasing. Local variables use camelCasing. Predefined type names are used.
+    /// </remarks>
+    public class StatisticsLibrary
     {
-        public static double average(List<double> x, bool incneg)
+        /// <summary>
+        /// Calculates the average of the provided data.
+        /// </summary>
+        /// <param name="values">The list of double precision values.</param>
+        /// <param name="includeNegative">Includes negative values in the calculation if set to true.</param>
+        /// <returns>The average of the list.</returns>
+        /// <exception cref="ArgumentException">Thrown when the list contains no non-negative values.</exception>
+        public static double CalculateAverage(List<double> values, bool includeNegative)
         {
-            double s = sum(x, incneg);
-            int c = 0;
-            for (int i = 0; i < x.Count; i++)
+            double sum = CalculateSum(values, includeNegative);
+            int count = 0;
+            foreach (double value in values)
             {
-                if (incneg || x[i] >= 0)
+                if (includeNegative || value >= 0)
                 {
-                    c++;
+                    count++;
                 }
             }
-            if (c == 0)
+            if (count == 0)
             {
-                throw new ArgumentException("x contains no values are > 0");
+                throw new ArgumentException("Input list contains no values that are greater than zero.");
             }
-            return s / c;
+            return sum / count;
         }
 
-        public static double sum(List<double> x, bool incneg)
+        /// <summary>
+        /// Sums the provided list of values.
+        /// </summary>
+        /// <param name="values">The list of double precision values.</param>
+        /// <param name="includeNegative">Includes negative values in the sum if set to true.</param>
+        /// <returns>The sum of the list.</returns>
+        /// <exception cref="ArgumentException">Thrown when the list is empty.</exception>
+        public static double CalculateSum(List<double> values, bool includeNegative)
         {
-            if (x.Count < 0)
+            if (values.Count == 0)
             {
-                throw new ArgumentException("x cannot be empty");
+                throw new ArgumentException("Input list cannot be empty.");
             }
 
-            double sum = 0.0;
-            foreach (double val in x)
+            double total = 0.0;
+            foreach (double value in values)
             {
-                if (incneg || val >= 0)
+                if (includeNegative || value >= 0)
                 {
-                    sum += val;
+                    total += value;
                 }
             }
-            return sum;
+            return total;
         }
 
-        public static double median(List<double> data)
+        /// <summary>
+        /// Calculates the median of the provided data.
+        /// </summary>
+        /// <param name="data">The list of double precision values, sorted in ascending order.</param>
+        /// <returns>The median value.</returns>
+        /// <exception cref="ArgumentException">Thrown when the data list is empty.</exception>
+        public static double CalculateMedian(List<double> data)
         {
             if (data.Count == 0)
             {
-                throw new ArgumentException("data cannot be empty");
+                throw new ArgumentException("Data cannot be empty.");
             }
 
             data.Sort();
+            int middleIndex = data.Count / 2;
 
-            double median = data[data.Count / 2];
-            if (data.Count % 2 == 0)
-                median = (data[data.Count / 2] + data[data.Count / 2 - 1]) / 2;
-
-            return median;
+            return data.Count % 2 != 0 ? data[middleIndex] : (data[middleIndex - 1] + data[middleIndex]) / 2.0;
         }
 
-        public static double stdev(List<double> data)
+        /// <summary>
+        /// Calculates the standard deviation of the provided data.
+        /// </summary>
+        /// <param name="data">The list of double precision values.</param>
+        /// <returns>The standard deviation.</returns>
+        /// <exception cref="ArgumentException">Thrown when the data list is empty or has only one element.</exception>
+        public static double CalculateStandardDeviation(List<double> data)
         {
             if (data.Count <= 1)
             {
-                throw new ArgumentException("data cannot be empty");
+                throw new ArgumentException("Data must contain more than one element.");
             }
 
-            int n = data.Count;
-            double s = 0;
-            double a = average(data, true);
-
-            for (int i = 0; i < n; i++)
+            double mean = CalculateAverage(data, true);
+            double sumOfSquares = 0.0;
+            foreach (double value in data)
             {
-                double v = data[i];
-                s += Math.Pow(v - a, 2);
+                sumOfSquares += Math.Pow(value - mean, 2);
             }
-            double stdev = Math.Sqrt(s / (n - 1));
-            return stdev;
+            return Math.Sqrt(sumOfSquares / (data.Count - 1));
         }
 
-        static void Main(string[] args)
+        static void Main()
         {
             Console.WriteLine("Sample Output for Statistical Functions Library");
-            List<Double> testDataD = new List<Double> { 2.2, 3.3, 66.2, 17.5, 30.2, 31.1 };
-            Console.WriteLine("The sum of the array = {0}", A3.sum(testDataD, true));
-            Console.WriteLine("The average of the array = {0}", A3.average(testDataD, true));
-            Console.WriteLine("The median value of the Double data set = {0}", A3.median(testDataD));
-            Console.WriteLine("The sample standard deviation of the Double test set = {0}\n", A3.stdev(testDataD));
-            Console.WriteLine("Press enter key to exit...");
-            Console.ReadLine();
+            List<double> testData = new List<double> { 2.2, 3.3, 66.2, 17.5, 30.2, 31.1 };
+            Console.WriteLine("The sum of the array = {0}", CalculateSum(testData, true));
+            Console.WriteLine("The average of the array = {0}", CalculateAverage(testData, true));
+            Console.WriteLine("The median value of the double data set = {0}", CalculateMedian(testData));
+            Console.WriteLine("The sample standard deviation of the double test set = {0}\n", CalculateStandardDeviation(testData));
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
     }
-
-    
 }
